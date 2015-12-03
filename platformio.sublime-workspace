@@ -1,1 +1,355 @@
-{}
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"buil",
+				"buildInfos	[]BuildInfo ν"
+			],
+			[
+				"P",
+				"PkgHash	string ν"
+			],
+			[
+				"fil",
+				"OpenFile	*os.File, error ƒ"
+			],
+			[
+				"ma",
+				"matches	[]string ν"
+			],
+			[
+				"cmd",
+				"cmdKick	 ƒ"
+			],
+			[
+				"B",
+				"BuildInfo	struct ʈ"
+			],
+			[
+				"bu",
+				"buildInfo	struct ʈ"
+			],
+			[
+				"p",
+				"Println	n int, err error ƒ"
+			],
+			[
+				"cwd",
+				"cwdDirs	[]string ν"
+			],
+			[
+				"L",
+				"logmsg	string ν"
+			],
+			[
+				"go",
+				"gotest	error ƒ"
+			],
+			[
+				"Bui",
+				"BuildQueue	struct ʈ"
+			],
+			[
+				"im",
+				"import	import (...) ʂ"
+			],
+			[
+				"F",
+				"FileMode	uint32 ʈ"
+			],
+			[
+				"Mk",
+				"MkdirAll	error ƒ"
+			],
+			[
+				"lo",
+				"logfile	string ν"
+			],
+			[
+				"S",
+				"Second	 Ɩ"
+			],
+			[
+				"Fil",
+				"NewFile	*os.File ƒ"
+			],
+			[
+				"D",
+				"Duration	int64 ʈ"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"contents": "#include \"Arduino.h\"\n#include <MFRC522.h>\n\nvoid setup() {\n    pinMode(13, OUTPUT);\n}\n\nvoid loop() {}\n",
+			"file": "src/main.cpp",
+			"file_size": 101,
+			"file_write_time": 130935720270836102,
+			"settings":
+			{
+				"buffer_size": 101,
+				"line_ending": "Unix",
+				"name": "#include \"Arduino.h\""
+			}
+		}
+	],
+	"build_system": "PlatformIO",
+	"build_system_choices":
+	[
+		[
+			[
+				[
+					"PlatformIO",
+					""
+				],
+				[
+					"PlatformIO",
+					"Clean"
+				],
+				[
+					"PlatformIO",
+					"Upload"
+				]
+			],
+			[
+				"PlatformIO",
+				""
+			]
+		]
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 390.0,
+		"last_filter": "Package Control: ",
+		"selected_items":
+		[
+			[
+				"Package Control: ",
+				"Package Control: Remove Package"
+			],
+			[
+				"Package Control: install",
+				"Package Control: Install Package"
+			],
+			[
+				"Package Control: ins",
+				"Package Control: Install Package"
+			],
+			[
+				"GoSublime: ",
+				"GoSublime: Goto Definition"
+			],
+			[
+				"Package Control: in",
+				"Package Control: Install Package"
+			]
+		],
+		"width": 449.0
+	},
+	"console":
+	{
+		"height": 139.0,
+		"history":
+		[
+			"import urllib.request,os,hashlib; h = '2915d1851351e5ee549c20394736b442' + '8bc59f460fa1548d1514676163dafc88'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)"
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/home/lmw/development/github.com/arduino_rfid_musicplayer"
+	],
+	"file_history":
+	[
+		"/home/lmw/.config/sublime-text-3/Packages/ClangAutoComplete/ClangAutoComplete.sublime-settings",
+		"/home/lmw/development/github.com/arduino_rfid_musicplayer/src/main.go",
+		"/home/lmw/development/go/src/github.com/simulatedsimian/alfred/buildtools.go",
+		"/home/lmw/development/go/src/github.com/simulatedsimian/alfred/buildview.go",
+		"/home/lmw/development/go/src/github.com/simulatedsimian/alfred/builder.go",
+		"/home/lmw/development/go/src/github.com/simulatedsimian/alfred/cmdls.go",
+		"/home/lmw/development/go/src/github.com/simulatedsimian/alfred/main.go",
+		"/home/lmw/development/go/src/github.com/simulatedsimian/alfred/webhook.go",
+		"/home/lmw/development/go/src/github.com/simulatedsimian/alfred/cmdserve.go",
+		"/home/lmw/development/go/src/github.com/simulatedsimian/alfred/cmdkick.go",
+		"/home/lmw/development/go/src/github.com/simulatedsimian/alfred/utils.go",
+		"/usr/local/go/src/encoding/json/decode.go",
+		"/home/lmw/development/go/src/github.com/simulatedsimian/alfred/process.go",
+		"/home/lmw/development/go/src/github.com/simulatedsimian/alfred/builder_test.go",
+		"/home/lmw/development/go/src/github.com/simulatedsimian/emu6502/core6502/parseutils.go",
+		"/home/lmw/development/go/src/github.com/simulatedsimian/gogo/gogo.go",
+		"/home/lmw/development/go/src/github.com/simulatedsimian/gogo/gogo_test.go",
+		"/home/lmw/.config/sublime-text-3/Packages/GoSublime/README.md",
+		"/home/lmw/development/go/src/github.com/simulatedsimian/runes/runes.go",
+		"/usr/local/go/src/strings/strings.go",
+		"/home/lmw/development/go/src/github.com/simulatedsimian/alfred/payload.go",
+		"/home/lmw/development/go/src/github.com/simulatedsimian/alfred/process_test.go",
+		"/home/lmw/.config/sublime-text-3/Packages/GoSublime/CHANGELOG.md",
+		"/home/lmw/.config/sublime-text-3/Packages/GoSublime/USAGE.md"
+	],
+	"find":
+	{
+		"height": 39.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 0,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "src/main.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 101,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								41,
+								41
+							]
+						],
+						"settings":
+						{
+							"auto_name": "#include \"Arduino.h\"",
+							"syntax": "Packages/C++/C++.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 0.0
+	},
+	"input":
+	{
+		"height": 39.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.exec":
+	{
+		"height": 148.0
+	},
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"pinned_build_system": "PlatformIO",
+	"project": "platformio.sublime-project",
+	"replace":
+	{
+		"height": 0.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 360.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}

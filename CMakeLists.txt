@@ -6,6 +6,7 @@ set(PLATFORMIO_CMD "/home/lmw/.local/bin/platformio")
 
 include_directories("$ENV{HOME}/.platformio/packages/framework-arduinoavr/variants/leonardo")
 include_directories("$ENV{HOME}/.platformio/packages/framework-arduinoavr/cores/arduino")
+include_directories("$ENV{HOME}/.platformio/packages/framework-arduinoavr/libraries/SPI")
 include_directories("$ENV{HOME}/.platformio/packages/toolchain-atmelavr/avr/include")
 include_directories("$ENV{HOME}/.platformio/packages/toolchain-atmelavr/lib/gcc/avr/4.8.1/include")
 include_directories("$ENV{HOME}/.platformio/packages/toolchain-atmelavr/lib/gcc/avr/4.8.1/include-fixed")
@@ -39,4 +40,8 @@ add_custom_target(
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-add_executable(arduino_rfid_musicplayer src/main.cpp)
+add_executable(arduino_rfid_musicplayer
+        src/main.cpp
+        src/state.cpp src/state.h
+        src/RFIDReader.cpp src/RFIDReader.h
+        src/MP3Player.cpp src/MP3Player.h)

@@ -1,8 +1,19 @@
 #include "Arduino.h"
-#include <MFRC522.h>
+#include "RFIDReader.h"
+#include "SPI.h"
+#include "MP3Player.h"
 
 void setup() {
-    pinMode(13, OUTPUT);
+    Serial.begin(9600);
+    while (!Serial);
+    SPI.begin();
+
+    RFIDReader::Setup();
+    MP3Player::Setup();
 }
 
-void loop() {}
+void loop() {
+    RFIDReader::stateMachine.stateAction();
+    MP3Player::stateMachine.stateAction();
+}
+
