@@ -13,6 +13,8 @@ void setup() {
 }
 
 void loop() {
+    Serial.print(".");
+    delay(10);
     RFIDReader::stateMachine.stateAction();
     MP3Player::stateMachine.stateAction();
 }

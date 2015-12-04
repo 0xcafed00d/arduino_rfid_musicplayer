@@ -11,6 +11,8 @@ namespace MP3Player {
     extern StateMachine stateMachine;
 
     void Setup();
+    void PlayAlbum(int id);
+
 };
 
 

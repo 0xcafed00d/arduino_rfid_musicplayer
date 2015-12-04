@@ -30,5 +30,9 @@ namespace MP3Player {
         stateWaitForAlbumEnd = &waitForAlbumEnd;
         stateMachine.stateGoto(&init);
     }
+
+    void PlayAlbum(int id) {
+
+    }
 }
 
