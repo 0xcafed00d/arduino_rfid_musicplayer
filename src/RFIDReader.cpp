@@ -17,12 +17,7 @@ public:
     }
 };
 
-void dump_byte_array(byte *buffer, byte bufferSize) {
-    for (byte i = 0; i < bufferSize; i++) {
-        Serial.print(buffer[i] < 0x10 ? " 0" : " ");
-        Serial.print(buffer[i], HEX);
-    }
-}
+
 
 namespace RFIDReader {
 
@@ -47,6 +42,12 @@ namespace RFIDReader {
         Serial.println(v);
     }
 
+    void dump_byte_array(byte *buffer, byte bufferSize) {
+        for (byte i = 0; i < bufferSize; i++) {
+            log(buffer[i] < 0x10 ? " 0" : " ");
+            Serial.print(buffer[i], HEX);
+        }
+    }
     struct Init : public State {
 
         void enter() {
@@ -64,14 +65,13 @@ namespace RFIDReader {
 
     struct WaitingForCard : public State {
         void enter() {
-            Serial.println();
-            Serial.println();
+            logln(' ');
+            logln(' ');
             logln(F("RFID Reader enter WaitingForCard"));
         }
 
         void action() {
             if (mfrc522.PICC_IsNewCardPresent()){
-                logln(F("Got card"));
                 stateGoto(stateReadCard);
             }
         }
@@ -82,10 +82,9 @@ namespace RFIDReader {
         TimeOut timeout;
 
         void enter() {
-
             logln(F("RFID Reader enter ReadCard"));
             gotCard = false;
-            timeout = TimeOut(1000);
+            timeout = TimeOut(500);
         }
 
         void action() {
@@ -94,14 +93,37 @@ namespace RFIDReader {
                 stateGoto(stateRestart);
             }
 
-            if (mfrc522.PICC_ReadCardSerial()) {
-                Serial.print(F("Card UID:"));
-                dump_byte_array(mfrc522.uid.uidByte, mfrc522.uid.size);
-                Serial.println();
+            byte buffer[18];
+            byte size = sizeof(buffer);
 
-                logln("got");
+            if (mfrc522.PICC_ReadCardSerial()) {
+                log(F("Card UID:"));
+                dump_byte_array(mfrc522.uid.uidByte, mfrc522.uid.size);
+                logln("");
+
+                logln(F("Authenticating using key A..."));
+                MFRC522::StatusCode status =  (MFRC522::StatusCode)mfrc522.PCD_Authenticate(MFRC522::PICC_CMD_MF_AUTH_KEY_A, 1, &key, &(mfrc522.uid));
+                if (status != MFRC522::STATUS_OK) {
+                    log(F("PCD_Authenticate() failed: "));
+                    logln(mfrc522.GetStatusCodeName(status));
+                } else {
+                    
+                    // Read data from the block
+                    log(F("Reading data from block ")); log(1);
+                    logln(F(" ..."));
+                    status = (MFRC522::StatusCode)mfrc522.MIFARE_Read(1, buffer, &size);
+                    if (status != MFRC522::STATUS_OK) {
+                        log(F("MIFARE_Read() failed: "));
+                        logln(mfrc522.GetStatusCodeName(status));
+                    }
+                    log(F("Data in block ")); log(1); logln(F(":"));
+                    dump_byte_array(buffer, 16); logln("");
+                    logln("");
+                }
+
                 stateGoto(stateRestart);
             }
+
         }
 
         void leave() {
@@ -117,7 +139,7 @@ namespace RFIDReader {
 
         void enter() {
             logln(F("RFID Reader enter Restart"));
-            timeOut = TimeOut(5000);
+            timeOut = TimeOut(500);
         }
 
         void action() {
