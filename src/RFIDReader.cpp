@@ -78,13 +78,39 @@ namespace RFIDReader {
     } waitingForCard;
 
     struct ReadCard : public State {
-        bool gotCard;
         TimeOut timeout;
 
         void enter() {
             logln(F("RFID Reader enter ReadCard"));
-            gotCard = false;
             timeout = TimeOut(500);
+        }
+
+        bool readFromCard (byte* buffer, byte size) {
+            logln(F("Authenticating using key A..."));
+            MFRC522::StatusCode status = (MFRC522::StatusCode)mfrc522.PCD_Authenticate(MFRC522::PICC_CMD_MF_AUTH_KEY_A,
+                                                                                        1, &key, &(mfrc522.uid));
+            if (status != MFRC522::STATUS_OK) {
+                log(F("PCD_Authenticate() failed: "));
+                logln(mfrc522.GetStatusCodeName(status));
+                return false;
+            }
+
+            // Read data from the block
+            log(F("Reading data from block ")); log(1);
+            logln(F(" ..."));
+            status = (MFRC522::StatusCode)mfrc522.MIFARE_Read(1, buffer, &size);
+            if (status != MFRC522::STATUS_OK) {
+                log(F("MIFARE_Read() failed: "));
+                logln(mfrc522.GetStatusCodeName(status));
+                return false;
+            }
+
+            return true;
+        }
+
+        bool writeToCard (byte* buffer, byte size) {
+
+            return false;
         }
 
         void action() {
@@ -101,26 +127,13 @@ namespace RFIDReader {
                 dump_byte_array(mfrc522.uid.uidByte, mfrc522.uid.size);
                 logln("");
 
-                logln(F("Authenticating using key A..."));
-                MFRC522::StatusCode status =  (MFRC522::StatusCode)mfrc522.PCD_Authenticate(MFRC522::PICC_CMD_MF_AUTH_KEY_A, 1, &key, &(mfrc522.uid));
-                if (status != MFRC522::STATUS_OK) {
-                    log(F("PCD_Authenticate() failed: "));
-                    logln(mfrc522.GetStatusCodeName(status));
-                } else {
-                    
-                    // Read data from the block
-                    log(F("Reading data from block ")); log(1);
-                    logln(F(" ..."));
-                    status = (MFRC522::StatusCode)mfrc522.MIFARE_Read(1, buffer, &size);
-                    if (status != MFRC522::STATUS_OK) {
-                        log(F("MIFARE_Read() failed: "));
-                        logln(mfrc522.GetStatusCodeName(status));
-                    }
+                bool ok = readFromCard(buffer, size);
+
+                if (ok){
                     log(F("Data in block ")); log(1); logln(F(":"));
                     dump_byte_array(buffer, 16); logln("");
                     logln("");
                 }
-
                 stateGoto(stateRestart);
             }
 
