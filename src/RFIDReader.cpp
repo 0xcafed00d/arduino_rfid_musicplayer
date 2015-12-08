@@ -2,7 +2,7 @@
 // Created by lmw on 03/12/15.
 //
 #include "Arduino.h"
-#include <MFRC522.h>
+#include <MFRC522.h> // https://github.com/miguelbalboa/rfid
 #include "state.h"
 
 class TimeOut {
@@ -42,6 +42,10 @@ namespace RFIDReader {
         Serial.println(v);
     }
 
+    void logln () {
+        Serial.println();
+    }
+
     void dump_byte_array(byte *buffer, byte bufferSize) {
         for (byte i = 0; i < bufferSize; i++) {
             log(buffer[i] < 0x10 ? " 0" : " ");
@@ -65,8 +69,8 @@ namespace RFIDReader {
 
     struct WaitingForCard : public State {
         void enter() {
-            logln(' ');
-            logln(' ');
+            logln();
+            logln();
             logln(F("RFID Reader enter WaitingForCard"));
         }
 
@@ -85,10 +89,10 @@ namespace RFIDReader {
             timeout = TimeOut(500);
         }
 
-        bool readFromCard (byte* buffer, byte size) {
+        bool readFromCard (byte* buffer, byte size, byte blockAddr) {
             logln(F("Authenticating using key A..."));
             MFRC522::StatusCode status = (MFRC522::StatusCode)mfrc522.PCD_Authenticate(MFRC522::PICC_CMD_MF_AUTH_KEY_A,
-                                                                                        1, &key, &(mfrc522.uid));
+                                                                                        blockAddr, &key, &(mfrc522.uid));
             if (status != MFRC522::STATUS_OK) {
                 log(F("PCD_Authenticate() failed: "));
                 logln(mfrc522.GetStatusCodeName(status));
@@ -96,9 +100,9 @@ namespace RFIDReader {
             }
 
             // Read data from the block
-            log(F("Reading data from block ")); log(1);
+            log(F("Reading data from block ")); log(blockAddr);
             logln(F(" ..."));
-            status = (MFRC522::StatusCode)mfrc522.MIFARE_Read(1, buffer, &size);
+            status = (MFRC522::StatusCode)mfrc522.MIFARE_Read(blockAddr, buffer, &size);
             if (status != MFRC522::STATUS_OK) {
                 log(F("MIFARE_Read() failed: "));
                 logln(mfrc522.GetStatusCodeName(status));
@@ -108,8 +112,26 @@ namespace RFIDReader {
             return true;
         }
 
-        bool writeToCard (byte* buffer, byte size) {
+        bool writeToCard (byte* buffer, byte size, byte blockAddr) {
+            // Authenticate using key B
+            Serial.println(F("Authenticating again using key B..."));
+            MFRC522::StatusCode status = (MFRC522::StatusCode)mfrc522.PCD_Authenticate(MFRC522::PICC_CMD_MF_AUTH_KEY_B, trailerBlock, &key, &(mfrc522.uid));
+            if (status != MFRC522::STATUS_OK) {
+                Serial.print(F("PCD_Authenticate() failed: "));
+                Serial.println(mfrc522.GetStatusCodeName(status));
+                return false;
+            }
 
+            // Write data to the block
+            Serial.print(F("Writing data into block ")); Serial.print(blockAddr);
+            Serial.println(F(" ..."));
+            dump_byte_array(dataBlock, 16); Serial.println();
+            status = (MFRC522::StatusCode) mfrc522.MIFARE_Write(blockAddr, dataBlock, 16);
+            if (status != MFRC522::STATUS_OK) {
+                Serial.print(F("MIFARE_Write() failed: "));
+                Serial.println(mfrc522.GetStatusCodeName(status));
+            }
+            Serial.println();
             return false;
         }
 
