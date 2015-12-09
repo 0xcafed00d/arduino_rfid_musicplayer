@@ -4,6 +4,7 @@
 #include "Arduino.h"
 #include <MFRC522.h> // https://github.com/miguelbalboa/rfid
 #include "state.h"
+#include "MP3Player.h"
 
 class TimeOut {
     uint32_t end;
@@ -173,6 +174,8 @@ namespace RFIDReader {
                     dump_byte_array(buffer, 16); logln("");
                     logln("");
                     logln((char*)buffer);
+
+                    MP3Player::PlayAlbum(1);
                 }
                 stateGoto(stateRestart);
             }
