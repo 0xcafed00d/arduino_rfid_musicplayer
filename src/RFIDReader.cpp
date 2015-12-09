@@ -52,6 +52,11 @@ namespace RFIDReader {
             Serial.print(buffer[i], HEX);
         }
     }
+
+    byte calcTrailerBlock (byte blockAddress) {
+        return ((blockAddress + 4) & ~0x3) - 1;
+    }
+
     struct Init : public State {
 
         void enter() {
@@ -86,13 +91,19 @@ namespace RFIDReader {
 
         void enter() {
             logln(F("RFID Reader enter ReadCard"));
+
             timeout = TimeOut(500);
         }
 
+
+
         bool readFromCard (byte* buffer, byte size, byte blockAddr) {
+
+            byte trailerBlock = calcTrailerBlock(blockAddr);
+
             logln(F("Authenticating using key A..."));
             MFRC522::StatusCode status = (MFRC522::StatusCode)mfrc522.PCD_Authenticate(MFRC522::PICC_CMD_MF_AUTH_KEY_A,
-                                                                                        blockAddr, &key, &(mfrc522.uid));
+                                                                                        trailerBlock, &key, &(mfrc522.uid));
             if (status != MFRC522::STATUS_OK) {
                 log(F("PCD_Authenticate() failed: "));
                 logln(mfrc522.GetStatusCodeName(status));
@@ -113,9 +124,12 @@ namespace RFIDReader {
         }
 
         bool writeToCard (byte* buffer, byte size, byte blockAddr) {
+            byte trailerBlock = calcTrailerBlock(blockAddr);
+
             // Authenticate using key B
             Serial.println(F("Authenticating again using key B..."));
-            MFRC522::StatusCode status = (MFRC522::StatusCode)mfrc522.PCD_Authenticate(MFRC522::PICC_CMD_MF_AUTH_KEY_B, trailerBlock, &key, &(mfrc522.uid));
+            MFRC522::StatusCode status = (MFRC522::StatusCode)mfrc522.PCD_Authenticate(MFRC522::PICC_CMD_MF_AUTH_KEY_B,
+                                                                                       trailerBlock, &key, &(mfrc522.uid));
             if (status != MFRC522::STATUS_OK) {
                 Serial.print(F("PCD_Authenticate() failed: "));
                 Serial.println(mfrc522.GetStatusCodeName(status));
@@ -125,14 +139,13 @@ namespace RFIDReader {
             // Write data to the block
             Serial.print(F("Writing data into block ")); Serial.print(blockAddr);
             Serial.println(F(" ..."));
-            dump_byte_array(dataBlock, 16); Serial.println();
-            status = (MFRC522::StatusCode) mfrc522.MIFARE_Write(blockAddr, dataBlock, 16);
+            status = (MFRC522::StatusCode) mfrc522.MIFARE_Write(blockAddr, buffer, 16);
             if (status != MFRC522::STATUS_OK) {
                 Serial.print(F("MIFARE_Write() failed: "));
                 Serial.println(mfrc522.GetStatusCodeName(status));
+                return false;
             }
-            Serial.println();
-            return false;
+            return true;
         }
 
         void action() {
@@ -144,21 +157,25 @@ namespace RFIDReader {
             byte buffer[18];
             byte size = sizeof(buffer);
 
+           // strcpy ((char*)buffer, "music:03");
+
             if (mfrc522.PICC_ReadCardSerial()) {
                 log(F("Card UID:"));
                 dump_byte_array(mfrc522.uid.uidByte, mfrc522.uid.size);
                 logln("");
 
-                bool ok = readFromCard(buffer, size);
+                //writeToCard(buffer, size, 1);
+
+                bool ok = readFromCard(buffer, size, 1);
 
                 if (ok){
                     log(F("Data in block ")); log(1); logln(F(":"));
                     dump_byte_array(buffer, 16); logln("");
                     logln("");
+                    logln((char*)buffer);
                 }
                 stateGoto(stateRestart);
             }
-
         }
 
         void leave() {
