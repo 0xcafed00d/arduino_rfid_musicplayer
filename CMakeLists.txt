@@ -44,4 +44,4 @@ add_executable(arduino_rfid_musicplayer
         src/main.cpp
         src/state.cpp src/state.h
         src/RFIDReader.cpp src/RFIDReader.h
-        src/MP3Player.cpp src/MP3Player.h)
+        src/MP3Player.cpp src/MP3Player.h src/utils.cpp src/utils.h)

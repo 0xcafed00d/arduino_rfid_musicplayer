@@ -5,20 +5,7 @@
 #include <MFRC522.h> // https://github.com/miguelbalboa/rfid
 #include "state.h"
 #include "MP3Player.h"
-
-class TimeOut {
-    uint32_t end;
-public:
-    TimeOut (uint32_t timeoutms = 0) {
-        end = (uint32_t)millis() + timeoutms;
-    }
-
-    bool hasTimedOut () const {
-        return millis() > end;
-    }
-};
-
-
+#include "utils.h"
 
 namespace RFIDReader {
 
@@ -33,26 +20,6 @@ namespace RFIDReader {
     MFRC522 mfrc522(SS_PIN, RST_PIN);
     MFRC522::MIFARE_Key key;
 
-    template <typename T>
-    void log (T v) {
-        Serial.print(v);
-    }
-
-    template <typename T>
-    void logln (T v) {
-        Serial.println(v);
-    }
-
-    void logln () {
-        Serial.println();
-    }
-
-    void dump_byte_array(byte *buffer, byte bufferSize) {
-        for (byte i = 0; i < bufferSize; i++) {
-            log(buffer[i] < 0x10 ? " 0" : " ");
-            Serial.print(buffer[i], HEX);
-        }
-    }
 
     byte calcTrailerBlock (byte blockAddress) {
         return ((blockAddress + 4) & ~0x3) - 1;
