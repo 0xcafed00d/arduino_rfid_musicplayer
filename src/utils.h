@@ -20,14 +20,19 @@ public:
     }
 };
 
+bool enableLogging (bool enable);
+bool loggingEnabled ();
+
 template <typename T>
 void log (T v) {
-    Serial.print(v);
+    if (loggingEnabled())
+        Serial.print(v);
 }
 
 template <typename T>
 void logln (T v) {
-    Serial.println(v);
+    if (loggingEnabled())
+        Serial.println(v);
 }
 
 void logln ();
