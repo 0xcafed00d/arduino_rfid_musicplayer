@@ -4,7 +4,7 @@
 
 #include "utils.h"
 
-void logln () {
+void Logln() {
     if (loggingEnabled())
         Serial.println();
 }
@@ -12,7 +12,7 @@ void logln () {
 void dump_byte_array(byte *buffer, byte bufferSize) {
     if (loggingEnabled()){
         for (byte i = 0; i < bufferSize; i++) {
-            log(buffer[i] < 0x10 ? " 0" : " ");
+            Log(buffer[i] < 0x10 ? " 0" : " ");
             Serial.print(buffer[i], HEX);
         }
     }
@@ -21,6 +21,15 @@ void dump_byte_array(byte *buffer, byte bufferSize) {
 static bool loggingState = false;
 
 bool enableLogging(bool enable) {
+    TimeOut to (10000);
+
+    Serial.begin(9600);
+    while (!Serial) {
+        if (to.hasTimedOut())
+            return false;
+    }
+    Serial.println("asdfajlfj");
+
     loggingState = enable;
     return true;
 }

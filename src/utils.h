@@ -24,18 +24,18 @@ bool enableLogging (bool enable);
 bool loggingEnabled ();
 
 template <typename T>
-void log (T v) {
+void Log(T v) {
     if (loggingEnabled())
         Serial.print(v);
 }
 
 template <typename T>
-void logln (T v) {
+void Logln(T v) {
     if (loggingEnabled())
         Serial.println(v);
 }
 
-void logln ();
+void Logln();
 void dump_byte_array(byte *buffer, byte bufferSize);
 
 

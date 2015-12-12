@@ -2,10 +2,12 @@
 #include "RFIDReader.h"
 #include "SPI.h"
 #include "MP3Player.h"
+#include "utils.h"
+
 
 void setup() {
-    Serial.begin(9600);
-    while (!Serial);
+    enableLogging(true);
+
     SPI.begin();
 
     RFIDReader::Setup();
