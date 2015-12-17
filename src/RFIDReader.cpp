@@ -28,7 +28,7 @@ namespace RFIDReader {
     struct Init : public State {
 
         void enter() {
-            Logln(F("RFID Reader enter INIT"));
+            utils::Logln(F("RFID Reader enter INIT"));
             mfrc522.PCD_Init();
 
             // Prepare the key (used both as key A and as key B)
@@ -42,9 +42,9 @@ namespace RFIDReader {
 
     struct WaitingForCard : public State {
         void enter() {
-            Logln();
-            Logln();
-            Logln(F("RFID Reader enter WaitingForCard"));
+            utils::Logln();
+            utils::Logln();
+            utils::Logln(F("RFID Reader enter WaitingForCard"));
         }
 
         void action() {
@@ -55,12 +55,12 @@ namespace RFIDReader {
     } waitingForCard;
 
     struct ReadCard : public State {
-        TimeOut timeout;
+        utils::TimeOut timeout;
 
         void enter() {
-            Logln(F("RFID Reader enter ReadCard"));
+            utils::Logln(F("RFID Reader enter ReadCard"));
 
-            timeout = TimeOut(500);
+            timeout = utils::TimeOut(500);
         }
 
 
@@ -69,23 +69,23 @@ namespace RFIDReader {
 
             byte trailerBlock = calcTrailerBlock(blockAddr);
 
-            Logln(F("Authenticating using key A..."));
+            utils::Logln(F("Authenticating using key A..."));
             MFRC522::StatusCode status = (MFRC522::StatusCode)mfrc522.PCD_Authenticate(MFRC522::PICC_CMD_MF_AUTH_KEY_A,
                                                                                         trailerBlock, &key, &(mfrc522.uid));
             if (status != MFRC522::STATUS_OK) {
-                Log(F("PCD_Authenticate() failed: "));
-                Logln(mfrc522.GetStatusCodeName(status));
+                utils::Log(F("PCD_Authenticate() failed: "));
+                utils::Logln(mfrc522.GetStatusCodeName(status));
                 return false;
             }
 
             // Read data from the block
-            Log(F("Reading data from block "));
-            Log(blockAddr);
-            Logln(F(" ..."));
+            utils::Log(F("Reading data from block "));
+            utils::Log(blockAddr);
+            utils::Logln(F(" ..."));
             status = (MFRC522::StatusCode)mfrc522.MIFARE_Read(blockAddr, buffer, &size);
             if (status != MFRC522::STATUS_OK) {
-                Log(F("MIFARE_Read() failed: "));
-                Logln(mfrc522.GetStatusCodeName(status));
+                utils::Log(F("MIFARE_Read() failed: "));
+                utils::Logln(mfrc522.GetStatusCodeName(status));
                 return false;
             }
 
@@ -119,7 +119,7 @@ namespace RFIDReader {
 
         void action() {
             if (timeout.hasTimedOut()) {
-                Logln("timedout");
+                utils::Logln("timedout");
                 stateGoto(stateRestart);
             }
 
@@ -129,22 +129,22 @@ namespace RFIDReader {
            // strcpy ((char*)buffer, "music:03");
 
             if (mfrc522.PICC_ReadCardSerial()) {
-                Log(F("Card UID:"));
-                dump_byte_array(mfrc522.uid.uidByte, mfrc522.uid.size);
-                Logln("");
+                utils::Log(F("Card UID:"));
+                utils::dump_byte_array(mfrc522.uid.uidByte, mfrc522.uid.size);
+                utils::Logln("");
 
                 //writeToCard(buffer, size, 1);
 
                 bool ok = readFromCard(buffer, size, 1);
 
                 if (ok){
-                    Log(F("Data in block "));
-                    Log(1);
-                    Logln(F(":"));
-                    dump_byte_array(buffer, 16);
-                    Logln("");
-                    Logln("");
-                    Logln((char *) buffer);
+                    utils::Log(F("Data in block "));
+                    utils::Log(1);
+                    utils::Logln(F(":"));
+                    utils::dump_byte_array(buffer, 16);
+                    utils::Logln("");
+                    utils::Logln("");
+                    utils::Logln((char *) buffer);
 
                     MP3Player::PlayAlbum(1);
                 }
@@ -153,7 +153,7 @@ namespace RFIDReader {
         }
 
         void leave() {
-            Logln(F("RFID Reader Leave ReadCard"));
+            utils::Logln(F("RFID Reader Leave ReadCard"));
             mfrc522.PICC_HaltA();
             mfrc522.PCD_StopCrypto1();
         }
@@ -161,11 +161,11 @@ namespace RFIDReader {
     } readCard;
 
     struct Restart : public State {
-        TimeOut timeOut;
+        utils::TimeOut timeOut;
 
         void enter() {
-            Logln(F("RFID Reader enter Restart"));
-            timeOut = TimeOut(500);
+            utils::Logln(F("RFID Reader enter Restart"));
+            timeOut = utils::TimeOut(500);
         }
 
         void action() {

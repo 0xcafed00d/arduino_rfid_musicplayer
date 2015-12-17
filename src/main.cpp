@@ -6,8 +6,6 @@
 
 
 void setup() {
-    enableLogging(true);
-
     SPI.begin();
 
     RFIDReader::Setup();
@@ -15,6 +13,7 @@ void setup() {
 }
 
 void loop() {
+    utils::UpdateLoggingState();
     delay(10);
     RFIDReader::stateMachine.stateAction();
     MP3Player::stateMachine.stateAction();

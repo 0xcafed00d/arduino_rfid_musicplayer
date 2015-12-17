@@ -4,36 +4,31 @@
 
 #include "utils.h"
 
-void Logln() {
-    if (loggingEnabled())
-        Serial.println();
-}
+namespace utils {
 
-void dump_byte_array(byte *buffer, byte bufferSize) {
-    if (loggingEnabled()){
-        for (byte i = 0; i < bufferSize; i++) {
-            Log(buffer[i] < 0x10 ? " 0" : " ");
-            Serial.print(buffer[i], HEX);
+
+    void Logln() {
+        if (loggingEnabled())
+            Serial.println();
+    }
+
+    void dump_byte_array(byte *buffer, byte bufferSize) {
+        if (loggingEnabled()){
+            for (byte i = 0; i < bufferSize; i++) {
+                Log(buffer[i] < 0x10 ? " 0" : " ");
+                Serial.print(buffer[i], HEX);
+            }
         }
     }
-}
 
-static bool loggingState = false;
+    static bool loggingState = false;
 
-bool enableLogging(bool enable) {
-    TimeOut to (10000);
-
-    Serial.begin(9600);
-    while (!Serial) {
-        if (to.hasTimedOut())
-            return false;
+    bool loggingEnabled() {
+        return loggingState;
     }
-    Serial.println("asdfajlfj");
 
-    loggingState = enable;
-    return true;
+    void UpdateLoggingState() {
+        loggingState = bool(Serial);
+    }
 }
 
-bool loggingEnabled() {
-    return loggingState;
-}
