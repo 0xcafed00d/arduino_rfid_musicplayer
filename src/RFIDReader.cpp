@@ -146,7 +146,7 @@ namespace RFIDReader {
                     utils::Logln("");
                     utils::Logln((char *) buffer);
 
-                    if (strcmp((const char*)buffer, "music:") == 0) {
+                    if (memcmp((const char*)buffer, "music:", 6) == 0) {
                         int id = (int)strtol((const char*)buffer + 6, NULL, 10);
                         MP3Player::PlayAlbum(id);
                     }

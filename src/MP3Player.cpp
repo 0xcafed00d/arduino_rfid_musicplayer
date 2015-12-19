@@ -4,6 +4,7 @@
 
 #include "Arduino.h"
 #include "state.h"
+#include "utils.h"
 
 /************Command byte**************************/
 #define CMD_NEXT_SONG 0X01
@@ -96,6 +97,8 @@ namespace MP3Player {
     }
 
     void PlayAlbum(int id) {
+        utils::Log(F("Requesting Album "));
+        utils::Logln(id);
         playTrack = id;
     }
 }
