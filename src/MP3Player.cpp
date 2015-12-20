@@ -7,37 +7,28 @@
 #include "utils.h"
 
 /************Command byte**************************/
-#define CMD_NEXT_SONG 0X01
-#define CMD_PREV_SONG 0X02
-#define CMD_PLAY_W_INDEX 0X03
-#define CMD_VOLUME_UP 0X04
-#define CMD_VOLUME_DOWN 0X05
 #define CMD_SET_VOLUME 0X06
-#define CMD_SINGLE_CYCLE_PLAY 0X08
 #define CMD_SEL_DEV 0X09
 #define DEV_TF 0X02
-#define CMD_SLEEP_MODE 0X0A
-#define CMD_WAKE_UP 0X0B
-#define CMD_RESET 0X0C
-#define CMD_PLAY 0X0D
-#define CMD_PAUSE 0X0E
 #define CMD_PLAY_FOLDER_FILE 0X0F
 #define CMD_STOP_PLAY 0X16
-#define CMD_FOLDER_CYCLE 0X17
-#define CMD_SHUFFLE_PLAY 0X18
-#define CMD_SET_SINGLE_CYCLE 0X19
-#define SINGLE_CYCLE_ON 0X00
-#define SINGLE_CYCLE_OFF 0X01
-#define CMD_SET_DAC 0X1A
-#define DAC_ON  0X00
-#define DAC_OFF 0X01
-#define CMD_PLAY_W_VOL 0X22
+#define CMD_QUERY_FLDR_TRACKS 0x4e
+
+#define RESP_MEDIA_REMOVED      0x3b
+#define RESP_MEDIA_INSERTED     0x3a
+#define RESP_TF_TRACK_FINISHED  0x3d
+#define RESP_ERROR              0x40
+#define RESP_ACK                0x41
+#define RESP_FLDR_TRACK_COUNT   0x4e
+
 
 namespace MP3Player {
 
     State *stateWaitForAlbumEnd;
     State *stateWaitPlay;
     StateMachine stateMachine;
+
+    static byte response[16];
 
     int playTrack = -1;
 
@@ -60,6 +51,30 @@ namespace MP3Player {
         }
     }
 
+    void CMDSelectTF () {
+        sendCommand(CMD_SEL_DEV, 0, DEV_TF);
+    }
+
+    void CMDSetVolume (byte volume) {
+        sendCommand(CMD_SET_VOLUME, 0, volume);
+    }
+
+    void CMDTrackCount (byte album) {
+        sendCommand(CMD_QUERY_FLDR_TRACKS, 0, album);
+    }
+
+    void CMDPlay (byte album, byte track) {
+        sendCommand(CMD_PLAY_FOLDER_FILE, album, track);
+    }
+
+    void CMDStop () {
+        sendCommand(CMD_STOP_PLAY, 0, 0);
+    }
+
+    bool ProcessResponse (byte* code, int* value) {
+        return false;
+    }
+
     struct Init : public State {
         void enter() {
             Serial1.begin(9600);
@@ -71,8 +86,7 @@ namespace MP3Player {
     struct WaitPlay : public State {
         void action() {
             if (playTrack != -1) {
-//                sendCommand(CMD_PLAY_FOLDER_FILE, (byte)playTrack, 1);
-                sendCommand(CMD_PLAY_W_INDEX, 0, 1);
+                CMDPlay(1,1);
                 stateGoto(stateWaitForAlbumEnd);
             }
         }
