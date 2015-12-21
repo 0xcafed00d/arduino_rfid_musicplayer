@@ -26,14 +26,12 @@
 namespace MP3Player {
 
     static State *stateWaitPlay;
-    static State *stateQueryTrackCount;
     static State *statePlay;
     StateMachine stateMachine;
     static byte response[16];
     static size_t respPos;
 
     int requestedAlbum = -1;
-    int requestedAlbumTrackCount = 0;
     int requestedAlbumCurrTrack = 0;
 
     void sendCommand(byte command, byte data1, byte data2)
@@ -134,37 +132,12 @@ namespace MP3Player {
 
         void action() {
             if (requestedAlbum != -1) {
-                stateGoto(stateQueryTrackCount);
+                requestedAlbumCurrTrack = 1;
+                stateGoto(statePlay);
             }
         }
     } waitPlay;
 
-    // ======================================================================================
-
-    struct QueryTrackCount : public State {
-        void enter() {
-            CMDTrackCount(requestedAlbum);
-        }
-
-        void action() {
-            byte code;
-            uint16_t value;
-
-            if (ProcessResponse(&code, &value)){
-                if (code == RESP_FLDR_TRACK_COUNT) {
-                    requestedAlbumTrackCount = (int)value;
-                    requestedAlbumCurrTrack = 1;
-                    stateGoto(statePlay);
-                    return;
-                }
-
-                if (code == RESP_ERROR) {
-                    stateGoto(stateWaitPlay);
-                    return;
-                }
-            }
-        }
-    } queryTrackCount;
 
     // ======================================================================================
 
@@ -206,7 +179,6 @@ namespace MP3Player {
 
     void Setup() {
         stateWaitPlay = &waitPlay;
-        stateQueryTrackCount = &queryTrackCount;
         statePlay = &play;
         stateMachine.stateGoto(&init);
     }
@@ -214,6 +186,10 @@ namespace MP3Player {
     void PlayAlbum(int id) {
         utils::Log(F("Requesting Album "));
         utils::Logln(id);
+        if (id == requestedAlbum) {
+            return; // already playing that album
+        }
+        stateMachine.stateGoto(stateWaitPlay);
         requestedAlbum = id;
     }
 }

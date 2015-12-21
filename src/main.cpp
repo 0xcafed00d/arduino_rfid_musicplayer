@@ -6,7 +6,7 @@
 
 
 void setup() {
-    while(!Serial);  // Remove before Flight
+    //while(!Serial);  // Remove before Flight
     SPI.begin();
 
     RFIDReader::Setup();
