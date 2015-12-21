@@ -7,11 +7,12 @@
 #include "utils.h"
 
 /************Command byte**************************/
-#define CMD_SET_VOLUME 0X06
-#define CMD_SEL_DEV 0X09
-#define DEV_TF 0X02
-#define CMD_PLAY_FOLDER_FILE 0X0F
-#define CMD_STOP_PLAY 0X16
+#define CMD_SET_VOLUME 0x06
+#define CMD_SEL_DEV 0x09
+#define DEV_TF 0x02
+#define CMD_PLAY_FOLDER_FILE 0x0F
+#define CMD_RESET 0x0C
+#define CMD_STOP_PLAY 0x16
 #define CMD_QUERY_FLDR_TRACKS 0x4e
 
 #define RESP_MEDIA_REMOVED      0x3b
@@ -24,13 +25,16 @@
 
 namespace MP3Player {
 
-    State *stateWaitForAlbumEnd;
-    State *stateWaitPlay;
+    static State *stateWaitPlay;
+    static State *stateQueryTrackCount;
+    static State *statePlay;
     StateMachine stateMachine;
-
     static byte response[16];
+    static size_t respPos;
 
-    int playTrack = -1;
+    int requestedAlbum = -1;
+    int requestedAlbumTrackCount = 0;
+    int requestedAlbumCurrTrack = 0;
 
     void sendCommand(byte command, byte data1, byte data2)
     {
@@ -67,53 +71,150 @@ namespace MP3Player {
         sendCommand(CMD_PLAY_FOLDER_FILE, album, track);
     }
 
+    void CMDReset () {
+        sendCommand(CMD_RESET, 0, 0);
+    }
+
     void CMDStop () {
         sendCommand(CMD_STOP_PLAY, 0, 0);
     }
 
-    bool ProcessResponse (byte* code, int* value) {
+    bool ProcessResponse (byte* code, uint16_t* value) {
+        int c;
+
+        while ((c = Serial1.read()) != -1) {
+            if (response[0] == 0) {
+                if (c == 0x7e){
+                    response[0] = byte(c);
+                    respPos = 1;
+                }
+            } else {
+                response[respPos] = byte(c);
+                if (response[respPos] == 0xef) {
+                    utils::dump_byte_array(response, 16);
+                    utils::Logln();
+                    *code = response[3];
+                    *value = (uint16_t(response[5])<<8) + uint16_t(response[6]);
+                    response[0] = 0;
+                    return true;
+                }
+                respPos++;
+            }
+
+        }
         return false;
     }
 
     struct Init : public State {
         void enter() {
+            respPos = 0;
+            response[0] = 0;
             Serial1.begin(9600);
-            sendCommand(CMD_SEL_DEV, 0, DEV_TF);
-            stateGoto(stateWaitPlay);
+            CMDSelectTF();
+        }
+
+        void action() {
+            byte code;
+            uint16_t value;
+
+            if (ProcessResponse(&code, &value)){
+                if (code == RESP_MEDIA_INSERTED && value == DEV_TF) {
+                    stateGoto(stateWaitPlay);
+                }
+            }
         }
     } init;
 
+    // ======================================================================================
+
     struct WaitPlay : public State {
+        void enter() {
+            requestedAlbum = -1;
+        }
+
         void action() {
-            if (playTrack != -1) {
-                CMDPlay(1,1);
-                stateGoto(stateWaitForAlbumEnd);
+            if (requestedAlbum != -1) {
+                stateGoto(stateQueryTrackCount);
+            }
+        }
+    } waitPlay;
+
+    // ======================================================================================
+
+    struct QueryTrackCount : public State {
+        void enter() {
+            CMDTrackCount(requestedAlbum);
+        }
+
+        void action() {
+            byte code;
+            uint16_t value;
+
+            if (ProcessResponse(&code, &value)){
+                if (code == RESP_FLDR_TRACK_COUNT) {
+                    requestedAlbumTrackCount = (int)value;
+                    requestedAlbumCurrTrack = 1;
+                    stateGoto(statePlay);
+                    return;
+                }
+
+                if (code == RESP_ERROR) {
+                    stateGoto(stateWaitPlay);
+                    return;
+                }
+            }
+        }
+    } queryTrackCount;
+
+    // ======================================================================================
+
+    struct Play : public State {
+        int endMessageCount;
+
+        void enter() {
+            endMessageCount = 0;
+            CMDPlay((byte)requestedAlbum, (byte)requestedAlbumCurrTrack);
+        }
+
+        void action() {
+            byte code;
+            uint16_t value;
+
+            if (ProcessResponse(&code, &value)) {
+                if (code == RESP_TF_TRACK_FINISHED) {
+                    endMessageCount++;
+                    if (endMessageCount == 2) { // track finished is sent twice for some reason.
+                        requestedAlbumCurrTrack++;
+                        stateGoto(statePlay);
+                        return;
+                    }
+                }
+
+                if (code == RESP_ERROR) {
+                    stateGoto(stateWaitPlay);
+                    return;
+                }
             }
         }
 
         void leave() {
-            playTrack = -1;
         };
-    } waitPlay;
+    } play;
 
-
-    struct WaitForAlbumEnd : public State {
-        void action() {
-
-        }
-    } waitForAlbumEnd;
+    // ======================================================================================
 
 
     void Setup() {
         stateWaitPlay = &waitPlay;
-        stateWaitForAlbumEnd = &waitForAlbumEnd;
+        stateQueryTrackCount = &queryTrackCount;
+        statePlay = &play;
         stateMachine.stateGoto(&init);
     }
 
     void PlayAlbum(int id) {
         utils::Log(F("Requesting Album "));
         utils::Logln(id);
-        playTrack = id;
+        requestedAlbum = id;
     }
 }
 
