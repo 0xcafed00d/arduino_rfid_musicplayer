@@ -192,5 +192,9 @@ namespace MP3Player {
         stateMachine.stateGoto(stateWaitPlay);
         requestedAlbum = id;
     }
+
+    bool IsPlaying() {
+        return requestedAlbum != -1;
+    }
 }
 

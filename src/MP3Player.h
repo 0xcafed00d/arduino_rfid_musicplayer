@@ -12,6 +12,7 @@ namespace MP3Player {
 
     void Setup();
     void PlayAlbum(int id);
+    bool IsPlaying ();
 };
 
 
