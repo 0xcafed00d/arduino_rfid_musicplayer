@@ -5,10 +5,10 @@
 #include "utils.h"
 
 utils::TimeOut inactiveTimer;
-const uint32_t offTime = 30000; // 30 seconds
+const uint32_t offTime = 30000;  // 30 seconds
 
 void setup() {
-    //while(!Serial);  // Remove before Flight
+    // while(!Serial);  // Remove before Flight
     SPI.begin();
 
     inactiveTimer = utils::TimeOut(offTime);
@@ -32,4 +32,3 @@ void loop() {
         digitalWrite(2, HIGH);
     }
 }
-

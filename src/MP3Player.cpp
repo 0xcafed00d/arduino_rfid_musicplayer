@@ -1,7 +1,3 @@
-//
-// Created by lmw on 03/12/15.
-//
-
 #include "Arduino.h"
 #include "state.h"
 #include "utils.h"
@@ -15,18 +11,17 @@
 #define CMD_STOP_PLAY 0x16
 #define CMD_QUERY_FLDR_TRACKS 0x4e
 
-#define RESP_MEDIA_REMOVED      0x3b
-#define RESP_MEDIA_INSERTED     0x3a
-#define RESP_TF_TRACK_FINISHED  0x3d
-#define RESP_ERROR              0x40
-#define RESP_ACK                0x41
-#define RESP_FLDR_TRACK_COUNT   0x4e
-
+#define RESP_MEDIA_REMOVED 0x3b
+#define RESP_MEDIA_INSERTED 0x3a
+#define RESP_TF_TRACK_FINISHED 0x3d
+#define RESP_ERROR 0x40
+#define RESP_ACK 0x41
+#define RESP_FLDR_TRACK_COUNT 0x4e
 
 namespace MP3Player {
 
-    static State *stateWaitPlay;
-    static State *statePlay;
+    static State* stateWaitPlay;
+    static State* statePlay;
     StateMachine stateMachine;
     static byte response[16];
     static size_t respPos;
@@ -34,55 +29,55 @@ namespace MP3Player {
     int requestedAlbum = -1;
     int requestedAlbumCurrTrack = 0;
 
-    void sendCommand(byte command, byte data1, byte data2)
-    {
+    void sendCommand(byte command, byte data1, byte data2) {
         byte buffer[8];
 
         delay(20);
-        buffer[0] = 0x7e; //starting byte
-        buffer[1] = 0xff; //version
-        buffer[2] = 0x06; //the number of bytes of the command without starting byte and ending byte
-        buffer[3] = command; //
+        buffer[0] = 0x7e;     // starting byte
+        buffer[1] = 0xff;     // version
+        buffer[2] = 0x06;     // the number of bytes of the command without starting byte
+                              // and ending byte
+        buffer[3] = command;  //
         buffer[4] = 0x00;
         buffer[5] = data1;
         buffer[6] = data2;
-        buffer[7] = 0xef; //ending byte
-        for(uint8_t i=0; i<8; i++)//
+        buffer[7] = 0xef;                // ending byte
+        for (uint8_t i = 0; i < 8; i++)  //
         {
-            Serial1.write(buffer[i]) ;
+            Serial1.write(buffer[i]);
         }
     }
 
-    void CMDSelectTF () {
+    void CMDSelectTF() {
         sendCommand(CMD_SEL_DEV, 0, DEV_TF);
     }
 
-    void CMDSetVolume (byte volume) {
+    void CMDSetVolume(byte volume) {
         sendCommand(CMD_SET_VOLUME, 0, volume);
     }
 
-    void CMDTrackCount (byte album) {
+    void CMDTrackCount(byte album) {
         sendCommand(CMD_QUERY_FLDR_TRACKS, 0, album);
     }
 
-    void CMDPlay (byte album, byte track) {
+    void CMDPlay(byte album, byte track) {
         sendCommand(CMD_PLAY_FOLDER_FILE, album, track);
     }
 
-    void CMDReset () {
+    void CMDReset() {
         sendCommand(CMD_RESET, 0, 0);
     }
 
-    void CMDStop () {
+    void CMDStop() {
         sendCommand(CMD_STOP_PLAY, 0, 0);
     }
 
-    bool ProcessResponse (byte* code, uint16_t* value) {
+    bool ProcessResponse(byte* code, uint16_t* value) {
         int c;
 
         while ((c = Serial1.read()) != -1) {
             if (response[0] == 0) {
-                if (c == 0x7e){
+                if (c == 0x7e) {
                     response[0] = byte(c);
                     respPos = 1;
                 }
@@ -92,13 +87,12 @@ namespace MP3Player {
                     utils::dump_byte_array(response, 16);
                     utils::Logln();
                     *code = response[3];
-                    *value = (uint16_t(response[5])<<8) + uint16_t(response[6]);
+                    *value = (uint16_t(response[5]) << 8) + uint16_t(response[6]);
                     response[0] = 0;
                     return true;
                 }
                 respPos++;
             }
-
         }
         return false;
     }
@@ -115,7 +109,7 @@ namespace MP3Player {
             byte code;
             uint16_t value;
 
-            if (ProcessResponse(&code, &value)){
+            if (ProcessResponse(&code, &value)) {
                 if (code == RESP_MEDIA_INSERTED && value == DEV_TF) {
                     stateGoto(stateWaitPlay);
                 }
@@ -138,7 +132,6 @@ namespace MP3Player {
         }
     } waitPlay;
 
-
     // ======================================================================================
 
     struct Play : public State {
@@ -156,7 +149,7 @@ namespace MP3Player {
             if (ProcessResponse(&code, &value)) {
                 if (code == RESP_TF_TRACK_FINISHED) {
                     endMessageCount++;
-                    if (endMessageCount == 2) { // track finished is sent twice for some reason.
+                    if (endMessageCount == 2) {  // track finished is sent twice for some reason.
                         requestedAlbumCurrTrack++;
                         stateGoto(statePlay);
                         return;
@@ -170,12 +163,10 @@ namespace MP3Player {
             }
         }
 
-        void leave() {
-        };
+        void leave(){};
     } play;
 
     // ======================================================================================
-
 
     void Setup() {
         stateWaitPlay = &waitPlay;
@@ -187,7 +178,7 @@ namespace MP3Player {
         utils::Log(F("Requesting Album "));
         utils::Logln(id);
         if (id == requestedAlbum) {
-            return; // already playing that album
+            return;  // already playing that album
         }
         stateMachine.stateGoto(stateWaitPlay);
         requestedAlbum = id;
@@ -197,4 +188,3 @@ namespace MP3Player {
         return requestedAlbum != -1;
     }
 }
-

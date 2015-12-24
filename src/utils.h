@@ -1,29 +1,25 @@
-//
-// Created by lmw on 10/12/15.
-//
-
 #ifndef ARDUINO_RFID_MUSICPLAYER_UTILS_H
 #define ARDUINO_RFID_MUSICPLAYER_UTILS_H
 
 #include "Arduino.h"
 
-
 namespace utils {
 
     class TimeOut {
         uint32_t end;
-    public:
-        TimeOut (uint32_t timeoutms = 0) {
+
+       public:
+        TimeOut(uint32_t timeoutms = 0) {
             end = (uint32_t)millis() + timeoutms;
         }
 
-        bool hasTimedOut () const {
+        bool hasTimedOut() const {
             return millis() > end;
         }
     };
 
-    void UpdateLoggingState ();
-    bool loggingEnabled ();
+    void UpdateLoggingState();
+    bool loggingEnabled();
 
     template <typename T>
     void Log(T v) {
@@ -38,10 +34,7 @@ namespace utils {
     }
 
     void Logln();
-    void dump_byte_array(byte *buffer, byte bufferSize);
-
-
+    void dump_byte_array(byte* buffer, byte bufferSize);
 }
 
-
-#endif //ARDUINO_RFID_MUSICPLAYER_UTILS_H
+#endif  // ARDUINO_RFID_MUSICPLAYER_UTILS_H

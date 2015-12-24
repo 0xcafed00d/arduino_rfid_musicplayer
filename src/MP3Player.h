@@ -1,19 +1,14 @@
-//
-// Created by lmw on 03/12/15.
-//
-
 #ifndef ARDUINO_RFID_MUSICPLAYER_MP3PLAYER_H
 #define ARDUINO_RFID_MUSICPLAYER_MP3PLAYER_H
 
 #include "state.h"
 
 namespace MP3Player {
-    extern StateMachine stateMachine;
+	extern StateMachine stateMachine;
 
-    void Setup();
-    void PlayAlbum(int id);
-    bool IsPlaying ();
+	void Setup();
+	void PlayAlbum(int id);
+	bool IsPlaying();
 };
 
-
-#endif //ARDUINO_RFID_MUSICPLAYER_MP3PLAYER_H
+#endif  // ARDUINO_RFID_MUSICPLAYER_MP3PLAYER_H
